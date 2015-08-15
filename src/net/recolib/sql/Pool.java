@@ -1,6 +1,5 @@
 package net.recolib.sql;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,7 +10,7 @@ public class Pool{
 
 	private static boolean idleDestroySchedulerActive = false;
 	
-	public static ConcurrentHashMap<String, List<DatabaseConnection>> openConnections = new ConcurrentHashMap<>();
+	private static ConcurrentHashMap<String, List<DatabaseConnection>> openConnections = new ConcurrentHashMap<>();
 	
 	protected static void castConnection(DatabaseConnection databaseConnection) throws PoolContainsConnectionException{
 		List<DatabaseConnection> connectionsList = null;
@@ -23,12 +22,11 @@ public class Pool{
 		if(connectionsList.contains(databaseConnection)) throw new PoolContainsConnectionException(databaseConnection);
 	
 		connectionsList.add(databaseConnection);
-		openConnections.put(databaseConnection.getConnectionInformation().serialize(), connectionsList);
 		
 		runIdleConnectionDestroyScheduler();
 	}
 	
-	protected static void reelConnection(DatabaseConnection databaseConnection) throws FailedReelConnectionException{
+	protected synchronized static void reelConnection(DatabaseConnection databaseConnection) throws FailedReelConnectionException{
 		List<DatabaseConnection> connectionsList = null;
 		
 		if(openConnections.containsKey(databaseConnection.getConnectionInformation().serialize())){
@@ -38,10 +36,9 @@ public class Pool{
 		connectionsList.remove(databaseConnection);
 		
 		if(connectionsList.isEmpty()) openConnections.remove(databaseConnection.getConnectionInformation().serialize());
-		else openConnections.put(databaseConnection.getConnectionInformation().serialize(), connectionsList);
 	}
 	
-	protected static DatabaseConnection fishConnection(String databaseInformation){
+	protected synchronized static DatabaseConnection fishConnection(String databaseInformation){
 		if(openConnections.containsKey(databaseInformation)){
 			for(DatabaseConnection databaseConnection : openConnections.get(databaseInformation)){
 				if(databaseConnection.isAvailable()) return databaseConnection;
@@ -67,15 +64,6 @@ public class Pool{
 	
 	private static void destroyIdleConnections(){
 		long currentTime = System.currentTimeMillis();
-		List<DatabaseConnection> toDestroy = new ArrayList<DatabaseConnection>();
-		
-		for(String key : openConnections.keySet()){
-			for(DatabaseConnection databaseConnection : openConnections.get(key)){
-				if(!databaseConnection.isAvailable()) continue;
-				if(databaseConnection.getIdleDestroyTime() < currentTime) toDestroy.add(databaseConnection);
-			}
-		}
-		
-		for(DatabaseConnection databaseConnection : toDestroy) databaseConnection.destroy();
+		openConnections.keySet().stream().parallel().forEach(key -> openConnections.get(key).removeIf(dbC -> dbC.getIdleDestroyTime() < currentTime && dbC.isAvailable()));
 	}
 }

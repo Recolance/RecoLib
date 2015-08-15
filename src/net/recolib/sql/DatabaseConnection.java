@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class DatabaseConnection{
+public final class DatabaseConnection{
 
 	private Connection connection;
 	private final ConnectionInformation connectionInformation;

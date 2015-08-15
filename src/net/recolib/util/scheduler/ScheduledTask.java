@@ -20,14 +20,20 @@ public abstract class ScheduledTask implements Runnable{
 	private static int taskIdCounter;
 	
 	private Timer timer;
-	private int taskId;
+	private int taskId = -1;
 	private boolean periodical;
+	private String taskDescription;
 	
 	public ScheduledTask(){
-		taskIdCounter++;
+		this("No description available.");
+	}
+	
+	public ScheduledTask(String taskDescription){
+		while(!TaskHolder.isActiveTask(taskIdCounter)) taskIdCounter++;
 		
 		this.timer = new Timer();
 		this.taskId = taskIdCounter;
+		this.taskDescription = taskDescription;
 		
 		mapTask();
 	}
@@ -103,6 +109,47 @@ public abstract class ScheduledTask implements Runnable{
 	 */
 	public int getTaskId(){
 		return this.taskId;
+	}
+	
+	
+	/**
+	 * Remap the task to a new task ID number. If the requested
+	 * new task ID is currently in use by another ScheduledTask
+	 * this method will return false and the task ID will not be
+	 * changed. If the change is successful this method will
+	 * return true.
+	 * 
+	 * @param taskId Task ID to be changed to.
+	 * @return True if the task ID was successfully changed. 
+	 */
+	public boolean setTaskId(int taskId){
+		if(TaskHolder.isActiveTask(taskId)) return false;
+		if(this.taskId != -1) unmapTask();
+		this.taskId = taskId;
+		mapTask();
+		return true;
+	}
+	
+	
+	/**
+	 * Task description is used to help identify the purpose of
+	 * the task's existence. If no description is given for the
+	 * task, this method will return "No description available."
+	 * 
+	 * @return Given description of the task.
+	 */
+	public String getTaskDescription(){
+		return this.taskDescription;
+	}
+	
+	
+	/**
+	 * Task description is used to help identify the purpose of
+	 * the task's existence. The default task description is
+	 * "No description available."
+	 */
+	public void setTaskDescription(String taskDescription){
+		this.taskDescription = taskDescription;
 	}
 	
 	

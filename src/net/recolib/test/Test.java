@@ -1,15 +1,19 @@
 package net.recolib.test;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 import net.recolib.sql.ConnectionInformation;
 import net.recolib.sql.DatabaseConnection;
 
 public class Test{
 
-	public static void main(String[] args){
-		ConnectionInformation connectionInformation = new ConnectionInformation("127.0.0.1", 3306, "test", "root", "codster1");
-		DatabaseConnection databaseConnection = DatabaseConnection.getDatabaseConnection(connectionInformation);
-		DatabaseConnection databaseConnection2 = DatabaseConnection.getDatabaseConnection(connectionInformation);
+	public static void main(String[] args) throws Exception{
 		
-		if(databaseConnection == databaseConnection2) System.out.println(true);
 	}
 }
