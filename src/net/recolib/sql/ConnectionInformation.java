@@ -40,6 +40,7 @@ public final class ConnectionInformation{
 		this.username = username;
 		this.password = null;
 	}
+	
 
 	/**
 	 * Getter for the ConnectionInformation host name.
