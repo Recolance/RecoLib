@@ -4,8 +4,20 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+/**
+ * Calculator class to provide some more functionality when performing
+ * different math operations.
+ * 
+ * @author Cody Filatov
+ */
 public class Calculator{
 
+	/**
+	 * Solve an equasion from a string. Exmaple: "2+2" would return 4;
+	 * 
+	 * @param equasion The equasion to solve.
+	 * @return Solution to the problem.
+	 */
 	public static Number solveFromString(String equasion){
 		ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
 		Number num = 0.0;
@@ -17,12 +29,29 @@ public class Calculator{
 		return num;
 	}
 	
-	public static Number add(Number number1, Number number2){
-		
-		return 1;
+	
+	/**
+	 * Addition security to floats to provide the correct answer and
+	 * preventing results such as "1.1999999999 ...".
+	 * 
+	 * @param f1 First float to add.
+	 * @param f2 Second float to add.
+	 * @return Sum of the addition.
+	 */
+	public static float addFloats(float f1, float f2){
+		return (float)addDoubles((double)f1, (double)f2);
 	}
 	
-	public static Number addDoubles(double d1, double d2){
+	
+	/**
+	 * Addition security to doubles to provide the correct answer and
+	 * preventing results such as "1.199999999 ...".
+	 * 
+	 * @param d1 First double to add.
+	 * @param d2 Second double to add.
+	 * @return Sum of the addition.
+	 */
+	public static double addDoubles(double d1, double d2){
 		double d1E = getDecimalExponent(d1);
 		double d2E = getDecimalExponent(d2);
 		double exponent = (double)d2E;
